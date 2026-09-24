@@ -1,18 +1,17 @@
 <?php
-require_once('users.php');
 require_once('function.php');
 require_once('koneksi.php');
 include('templates/header.php');
 ?>
 
 <!-- Page Heading -->
-<h1 class="h3 mb-4 text-gray-800">Buku Tamu</h1>
+<h1 class="h3 mb-4 text-gray-800">Data User</h1>
 
 <?php
 require_once('function.php');
     // jika ada tombol simpan
     if (isset($_POST['simpan'])) {
-        if (tambah_tamu($_POST) > 0) {
+        if (tambah_user($_POST) > 0) {
 ?>
         <div class="alert alert-success" role="alert">
             Data berhasil disimpan!
@@ -36,7 +35,7 @@ require_once('function.php');
                     <span class="icon text-white-50">
                         <i class="fas fa-plus"></i>
                     </span>
-                        <span class="text">Data Tamu</span>
+                        <span class="text">Data User</span>
                 </button>
             </div>
             <div class="card-body">
@@ -45,12 +44,8 @@ require_once('function.php');
                         <thead>
                             <tr>
                                 <th>No</th>
-                                <th>Tanggal</th>
-                                <th>Nama Tamu</th>
-                                <th>Alamat</th>
-                                <th>No. Telp/HP</th>
-                                <th>Bertemu  Dengan</th>
-                                <th>Kepentingan</th>
+                                <th>Username</th>
+                                <th>User Role</th>
                                 <th>Aksi</th>
                             </tr>
                         </thead>
@@ -58,22 +53,21 @@ require_once('function.php');
                             <?php
                             // Penomoran auto-increment
                             $no = 1;
-                            // Query untuk memanggil semua data dari tabel buku_tamu
-                            $buku_tamu = query("SELECT * FROM buku_tamu");
-                            foreach ($buku_tamu as $tamu) : ?>
+                            // Query untuk memanggil semua data dari tabel buku_user
+                            $users = query("SELECT * FROM users");
+                            foreach ($users as $user) : ?>
                                 <tr>
                                     <td><?= $no++; ?></td>
-                                    <td><?= $tamu['tanggal'] ?></td>
-                                    <td><?= $tamu['nama_tamu'] ?></td>
-                                    <td><?= $tamu['alamat'] ?></td>
-                                    <td><?= $tamu['no_hp'] ?></td>
-                                    <td><?= $tamu['bertemu'] ?></td>
-                                    <td><?= $tamu['kepentingan'] ?></td>
-                                    <td><a class="btn btn-success" href="edit-tamu.php?id=<?= $tamu['id_tamu']?>">Ubah</a>
-                                        <a onclick="return confirm('Apakah anda yakin ingin menghapus data ini?')" class="btn btn-danger" href="hapus-tamu.php?id=<?= $tamu['id_tamu']?>">Hapus</a></td>
+                                    <td><?= $user['username'] ?></td>
+                                    <td><?= $user['user_role'] ?></td>
+                                    <td>
+                                        <a class="btn btn-success" href="edit-user.php?id=<?= $user['id_user']?>">Ubah</a>
+                                        <a onclick="return confirm('Apakah anda yakin ingin menghapus data ini?')" class="btn btn-danger" 
+                                            href="hapus-user.php?id=<?= $user['id_user']?>">Hapus</a>
+                                    </td>
                                 </tr>
                                 <?php endforeach; ?>
-                        </tbody>         
+                        </tbody>    
                     </table>
                 </div>
             </div>
@@ -81,14 +75,12 @@ require_once('function.php');
 
 <?php
     // mengambil data barang dari tabel dengan kode terbesar
-    $query = mysqli_query($koneksi, "SELECT max(id_tamu) as kodeTerbesar FROM buku_tamu");
+    $query = mysqli_query($koneksi, "SELECT max(id_user) as kodeTerbesar FROM users");
     $data = mysqli_fetch_array($query);
-
-    // mengambil kode terbesar
-    $kodeTamu = $data['kodeTerbesar'];
+    $kodeuser = $data['kodeTerbesar'];
 
     // mengambil angka dari kode terbesar, menggunakan fungsi substr dan diubah ke integer dengan (int)
-    $urutan = (int) substr($kodeTamu, 2);
+    $urutan = (int) substr($kodeuser, 3, 2);
 
     // nomor yang diambil akan ditambah 1 untuk menentukan nomor urut berikutnya
     $urutan++;
@@ -97,7 +89,8 @@ require_once('function.php');
     // string printf("%03s", $urutan); berfungsi untuk membuat string menjadi 3 karakter
 
     // angka yang diambil tadi digabungkan dengan kode huruf yang kita inginkan, misalnya zt
-    $kodeTamu = "ZT" . sprintf("%03s", $urutan);
+    $huruf = "usr";
+    $kodeuser = $huruf . sprintf("%02s", $urutan);
 ?>
 
         <!-- Modal Tambah -->
@@ -112,43 +105,29 @@ require_once('function.php');
                 </button>
             </div>
             <div class="modal-body">
-    <form method="post" action="">
-
-        <input type="hidden" name="id_tamu" id="id_tamu" value="<?= $kodeTamu ?>">
-
-        <div class="form-group row">
-            <label for="nama_tamu" class="col-sm-3 col-form-label">Nama Tamu</label>
-            <div class="col-sm-8">
-                <input type="text" class="form-control" id="nama_tamu" name="nama_tamu">
-            </div>
-        </div>
-
-        <div class="form-group row">
-            <label for="alamat" class="col-sm-3 col-form-label">Alamat</label>
-            <div class="col-sm-8">
-                <textarea class="form-control" id="alamat" name="alamat"></textarea>
-            </div>
-        </div>
-
-        <div class="form-group row">
-            <label for="no_hp" class="col-sm-3 col-form-label">No. Telepon</label>
-            <div class="col-sm-8">
-                <input type="text" class="form-control" id="no_hp" name="no_hp">
-            </div>
-        </div>
-
-        <div class="form-group row">
-            <label for="bertemu" class="col-sm-3 col-form-label">Bertemu dg.</label>
-            <div class="col-sm-8">
-                <input type="text" class="form-control" id="bertemu" name="bertemu">
-            </div>
-        </div>
-
-        <div class="form-group row">
-            <label for="kepentingan" class="col-sm-3 col-form-label">Kepentingan</label>
-            <div class="col-sm-8">
-                <input type="text" class="form-control" id="kepentingan" name="kepentingan">
-            </div>
+                <form method="post" action="">
+                    <input type="hidden" name="id_user" id="id_user" value="<?= $kodeuser ?>">
+                    <div class="form-group row">
+                        <label for="username" class="col-sm-3 col-form-label">Username</label>
+                        <div class="col-sm-8">
+                            <input type="text" class="form-control" id="username" name="username">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="password" class="col-sm-3 col-form-label">Password</label>
+                        <div class="col-sm-8">
+                            <input type="password" class="form-control" id="password" name="password">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="user_role" class="col-sm-3 col-form-label">User Role</label>
+                        <div class="col-sm-8">
+                            <select class="form-control" id="user_role" name="user_role">
+                                <option value="admin">Administrator</option>
+                                <option value="operator">Operator</option>
+                            </select>
+                        </div>
+                    </div>
         </div>
 
         <!-- FOOTER FORM -->
