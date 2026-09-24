@@ -59,27 +59,6 @@
     <!-- Page level custom scripts -->
     <script src="assets/js/demo/datatables-demo.js"></script>
 
-    <!-- Page Heading -->
-    <h1 class="h3 mb-4 text-gray-800">Buku Tamu</h1>
-
-<?php
-    // jika ada tombol simpan
-    if (isset($_POST['simpan'])) {
-        if (tambah_tamu($_POST) > 0) {
-?>
-        <div class="alert alert-success" role="alert">
-            Data berhasil disimpan!
-        </div>
-<?php
-    } else {
-?>
-        <div class="alert alert-danger" role="alert">
-            Data gagal disimpan!
-        </div>
-<?php
-    }
-}
-?>
 
 <script>
     $(document).ready(function() {
