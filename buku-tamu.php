@@ -5,6 +5,27 @@ require_once('koneksi.php');
 include('templates/header.php');
 ?>
 
+<?php
+include_once('templates/header.php');
+
+// pengecekan user role bukan operator maka tidak boleh mengakses halaman
+if(($_SESSION['user_role']) != 'operator') {
+    echo"<script>alert('anda tidak memiliki akses')</script>";
+    echo"<script>window.location.href='index.php'</script>";
+}
+?>
+
+<?php
+// cek apabila ada user login dan user role nya adalah operator maka tampilkan buku-tamu
+if (isset($_SESSION['user_role']) && $_SESSION['user_role'] == 'operator') :
+?>
+    <li class="nav-item">
+        <a class="nav-link" href="buku-tamu.php">
+            <i class="fas fa-fw fa-book-open"></i>
+            <span>Buku Tamu</span></a>
+    </li>
+<?php endif; ?>
+
 <!-- Page Heading -->
 <h1 class="h3 mb-4 text-gray-800">Buku Tamu</h1>
 

@@ -4,6 +4,26 @@ require_once('koneksi.php');
 include('templates/header.php');
 ?>
 
+<?php
+include_once('templates/header.php');
+// pengecekan user role bukan admin maka tidak boleh mengakses halaman
+if(($_SESSION['user_role']) != 'admin') {
+    echo"<script>alert('anda tidak memiliki akses')</script>";
+    echo"<script>window.location.href='index.php'</script>";
+}
+?>
+
+<?php
+// cek apabila ada user login dan user role nya adalah admin maka tampilkan user
+if (isset($_SESSION['user_role']) && $_SESSION['user_role'] == 'admin') :
+?>
+    <li class="nav-item">
+        <a class="nav-link" href="users.php">
+            <i class="fas fa-fw fa-users"></i>
+            <span>User</span></a>
+    </li>
+<?php endif; ?>
+
 <!-- Page Heading -->
 <h1 class="h3 mb-4 text-gray-800">Data User</h1>
 
