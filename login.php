@@ -1,21 +1,32 @@
-<!DOCTYPE html>
-<html lang="en">
-
 <?php
+// memulai session
+session_start();
+
+// cek bila ada user yang sudah login maka akan redirect ke halaman dashboard
+if (isset($_SESSION['login'])) {
+    header('Location: index.php');
+    exit;
+}
+
 require 'koneksi.php';
-if(isset($_POST['login'])) {
+
+if (isset($_POST['login'])) {
     $username = $_POST['username'];
     $password = $_POST['password'];
 
     $result = mysqli_query($koneksi, "SELECT * FROM users WHERE username = '$username'");
 
     // cek apakah ada username
-    if(mysqli_num_rows($result) === 1) {
+    if (mysqli_num_rows($result) === 1) {
 
         // cek apakah passwordnya benar
         $row = mysqli_fetch_assoc($result);
 
-        if(password_verify($password, $row['password'])) {
+        if (password_verify($password, $row['password'])) {
+
+            // set session
+            $_SESSION['login'] = true;
+            $_SESSION['username'] = $username;
 
             // login berhasil
             header("Location: index.php");
@@ -26,6 +37,9 @@ if(isset($_POST['login'])) {
     $error = true;
 }
 ?>
+
+<!DOCTYPE html>
+<html lang="en">
 
 <head>
 
@@ -39,12 +53,13 @@ if(isset($_POST['login'])) {
 
     <!-- Custom fonts for this template-->
     <link href="assets/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+
     <link
         href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
         rel="stylesheet">
 
     <!-- Custom styles for this template-->
-    <link href="css/sb-admin-2.min.css" rel="stylesheet">
+    <link href="assets/css/sb-admin-2.min.css" rel="stylesheet">
 
 </head>
 
@@ -52,14 +67,15 @@ if(isset($_POST['login'])) {
 
     <div class="container">
 
-    <?php
-    if(isset($error)) : ?>
-    <div class="alert alert-danger mt-3" role="alert">
-        Username atau password salah!
-    </div>
-    <?php
-    endif;
-    ?>
+        <?php
+        if (isset($error)) :
+        ?>
+            <div class="alert alert-danger mt-3" role="alert">
+                Username atau password salah!
+            </div>
+        <?php
+        endif;
+        ?>
 
         <!-- Outer Row -->
         <div class="row justify-content-center">
@@ -67,43 +83,75 @@ if(isset($_POST['login'])) {
             <div class="col-xl-10 col-lg-12 col-md-9">
 
                 <div class="card o-hidden border-0 shadow-lg my-5">
-    <div class="card-body p-0">
-        <!-- Nested Row within Card Body -->
-        <div class="row">
-            <div class="col-lg-6 d-none d-lg-block bg-login-image">
-                <img src="assets/images/login-page.png" alt="">
-            </div>
-            <div class="col-lg-6">
-                <div class="p-5">
-                    <div class="text-center">
-                        <h1 class="h4 text-gray-900 mb-4">Welcome Back!</h1>
-                    </div>
-                    <form method="post" action="" class="user">
-                        <div class="form-group">
-                            <input type="text" class="form-control form-control-user" id="username" name="username" placeholder="Username ...">
-                        </div>
-                        <div class="form-group">
-                            <input type="password" class="form-control form-control-user" id="password" name="password" placeholder="Password ..">
-                        </div>
-                        <div class="form-group">
-                            <div class="custom-control custom-checkbox small">
-                                <input type="checkbox" class="custom-control-input" id="remember" name="remember">
-                                <label class="custom-control-label" for="customCheck">Remember Me</label>
+                    <div class="card-body p-0">
+
+                        <!-- Nested Row within Card Body -->
+                        <div class="row">
+
+                            <div class="col-lg-6 d-none d-lg-block bg-login-image">
+                                <img src="assets/images/login-page.png" alt="">
                             </div>
+
+                            <div class="col-lg-6">
+                                <div class="p-5">
+
+                                    <div class="text-center">
+                                        <h1 class="h4 text-gray-900 mb-4">Welcome Back!</h1>
+                                    </div>
+
+                                    <form method="post" action="" class="user">
+
+                                        <div class="form-group">
+                                            <input type="text"
+                                                class="form-control form-control-user"
+                                                id="username"
+                                                name="username"
+                                                placeholder="Username ...">
+                                        </div>
+
+                                        <div class="form-group">
+                                            <input type="password"
+                                                class="form-control form-control-user"
+                                                id="password"
+                                                name="password"
+                                                placeholder="Password ..">
+                                        </div>
+
+                                        <div class="form-group">
+                                            <div class="custom-control custom-checkbox small">
+                                                <input type="checkbox"
+                                                    class="custom-control-input"
+                                                    id="remember"
+                                                    name="remember">
+
+                                                <label class="custom-control-label" for="remember">
+                                                    Remember Me
+                                                </label>
+                                            </div>
+                                        </div>
+
+                                        <button type="submit"
+                                            name="login"
+                                            class="btn btn-primary btn-user btn-block">
+                                            Login
+                                        </button>
+
+                                    </form>
+
+                                    <hr>
+
+                                    <div class="text-center">
+                                        <a class="small" href="forgot-password.html">
+                                            Forgot Password?
+                                        </a>
+                                    </div>
+
+                                </div>
+                            </div>
+
                         </div>
-                        <button type="submit" name="login" class="btn btn-primary btn-user btn-block">
-                            Login
-                        </button>
-                    </form>
-                    <hr>
-                    <div class="text-center">
-                        <a class="small" href="forgot-password.html">Forgot Password?</a>
                     </div>
                 </div>
-            </div>
-        </div>
-    </div>
-</div>
 
             </div>
 
@@ -122,5 +170,4 @@ if(isset($_POST['login'])) {
     <script src="assets/js/sb-admin-2.min.js"></script>
 
 </body>
-
 </html>
